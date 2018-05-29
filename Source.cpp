@@ -12,6 +12,8 @@
 #include <vssym32.h>
 #include "resource.h"
 
+#define TOKEN L"rIiQzotV02ZRFq6CaKOFzaXvRVBwbL4dtpvNb1YKZA5"
+
 TCHAR szClassName[] = TEXT("Window");
 
 int UrlEncode(LPCWSTR lpszSrc, LPWSTR lpszDst)
@@ -120,11 +122,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			}
 			CloseThemeData(hTheme);
 		}
-		hButton = CreateWindow(TEXT("BUTTON"), TEXT("送信(F5)"), WS_VISIBLE | WS_CHILD, 0, 0, 0, 0, hWnd, (HMENU)IDOK, ((LPCREATESTRUCT)lParam)->hInstance, 0);
+		hButton = CreateWindowW(L"BUTTON", L"送信(F5)", WS_VISIBLE | WS_CHILD, 0, 0, 0, 0, hWnd, (HMENU)IDOK, ((LPCREATESTRUCT)lParam)->hInstance, 0);
 		SendMessage(hButton, WM_SETFONT, (WPARAM)hFont, 0);
-		hEdit1 = CreateWindowEx(WS_EX_CLIENTEDGE, TEXT("EDIT"), TEXT("[Access Token]"), WS_VISIBLE | WS_CHILD | ES_AUTOHSCROLL, 0, 0, 0, 0, hWnd, 0, ((LPCREATESTRUCT)lParam)->hInstance, 0);
+		hEdit1 = CreateWindowExW(WS_EX_CLIENTEDGE, L"EDIT", TOKEN, WS_VISIBLE | WS_CHILD | ES_AUTOHSCROLL, 0, 0, 0, 0, hWnd, 0, ((LPCREATESTRUCT)lParam)->hInstance, 0);
 		SendMessage(hEdit1, WM_SETFONT, (WPARAM)hFont, 0);
-		hEdit2 = CreateWindowEx(WS_EX_CLIENTEDGE, TEXT("EDIT"), 0, WS_VISIBLE | WS_CHILD | WS_HSCROLL | WS_VSCROLL | ES_MULTILINE | ES_AUTOHSCROLL | ES_AUTOVSCROLL, 0, 0, 0, 0, hWnd, 0, ((LPCREATESTRUCT)lParam)->hInstance, 0);
+		hEdit2 = CreateWindowExW(WS_EX_CLIENTEDGE, L"EDIT", 0, WS_VISIBLE | WS_CHILD | WS_HSCROLL | WS_VSCROLL | ES_MULTILINE | ES_AUTOHSCROLL | ES_AUTOVSCROLL, 0, 0, 0, 0, hWnd, 0, ((LPCREATESTRUCT)lParam)->hInstance, 0);
 		SendMessage(hEdit2, WM_SETFONT, (WPARAM)hFont, 0);
 		SendMessage(hEdit2, WM_PASTE, 0, 0);
 		SendMessage(hEdit2, EM_SETSEL, 0, -1);
@@ -167,8 +169,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst, LPSTR pCmdLine, int nCmdShow)
 {
+	{
+		int n = 0;
+		LPWSTR* argv = CommandLineToArgvW(GetCommandLineW(), &n);
+		if (n == 2)
+		{
+			SendNotify(TOKEN, argv[1]);
+			LocalFree(argv);
+			return 0;
+		}
+		LocalFree(argv);
+	}
 	MSG msg;
-	WNDCLASS wndclass = {
+	WNDCLASSW wndclass = {
 		0,
 		WndProc,
 		0,
@@ -180,10 +193,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst, LPSTR pCmdLine, int 
 		0,
 		szClassName
 	};
-	RegisterClass(&wndclass);
-	HWND hWnd = CreateWindow(
+	RegisterClassW(&wndclass);
+	HWND hWnd = CreateWindowW(
 		szClassName,
-		TEXT("Line Notify"),
+		L"Line Notify",
 		WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
 		CW_USEDEFAULT,
 		0,
